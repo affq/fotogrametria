@@ -2,12 +2,13 @@ def kmhtoms(kmh):
     return kmh * (1000 / 3600)
 
 class Camera:
-    def __init__(self, name, pixel_size, focal_length, frame_long, frame_short):
+    def __init__(self, name, pixel_size, focal_length, frame_long, frame_short, cycle):
         self.name = name
         self.pixel_size = pixel_size * 1e-6
         self.focal_length = focal_length * 1e-3
         self.frame_long = frame_long
         self.frame_short = frame_short
+        self.cycle = cycle
     
 
 class Plane:
@@ -17,3 +18,4 @@ class Plane:
         self.velocity_max = kmhtoms(velocity_max)
         self.ceiling = ceiling
         self.flight_time = flight_time
+
