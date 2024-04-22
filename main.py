@@ -7,8 +7,7 @@ class Window:
         self.root.title("Projektant nalotu fotogrametrycznego")
         self.root.geometry("800x600")
         
-        self.label = tk.Label(root, text="fotogramm", font=("Arial", 16))
-        self.label.pack(pady=20)
+        
 
 if __name__ == "__main__":
     root = tk.Tk()

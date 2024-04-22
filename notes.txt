@@ -1,4 +1,3 @@
-
 pokrycie podłużne od 0 do 99% co 0.1%
 pokrycie poprzeczne (odległośc między szeregami) od 0 do 99% co 0.1%
 wysokość
@@ -6,8 +5,6 @@ zmaina prędkości lotu samolotu
  
 gsd zmienia się na podstawie wysokości
 czas potrzebny na przelot na podstawie prędkości lotu
-wartość rozmazania można wyznaczyć
 
 x y wprowadzane w geodezyjnym układzie współrzędnych
-
 my stosujemy układ matematyczny wiec zamieniamy współrzędne
