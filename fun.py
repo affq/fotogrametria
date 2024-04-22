@@ -15,24 +15,6 @@ def calculate_height(gsd: float, camera: Camera) -> float:
     height = camera.focal_length * gsd / camera.pixel_size
     return height
 
-def calculate_base_terrain_dimensions(Ly: float, Lx: float, p: float, q: float) -> tuple:
-    '''
-    Funkcja oblicza terenowe wymiary bazy fotografowania.
-
-            Argumenty:
-                    Ly (float): terenowy zasięg zdjęcia w poprzek kierunku lotu
-                    Lx (float): terenowy zasięg zdjęcia wzdłuż kierunku lotu
-                    p (float): pokrycie podłużne
-                    q (float): pokrycie poprzeczne
-
-            Zwraca:
-                    bx (float): terenowy wymiar bazy fotografowania w poprzek kierunku lotu
-                    by (float): terenowy wymiar bazy fotografowania wzdłuż kierunku lotu
-    '''
-    bx = Lx * ((100-p)/100)
-    by = Ly * ((100-q)/100)
-    return bx, by
-
 def calculate_scale(height: float, camera: Camera) -> float:
     '''
     Funkcja oblicza skalę zdjęcia.
@@ -117,20 +99,18 @@ def calculate_amount_of_series(Dx: float, bx: float, Dy: float, by: float)-> tup
     nx = math.ceil(Dx/bx + 4)
     return ny, nx
 
-def check_interval(bx: float, v: float, cam: Camera):
+def check_interval(dtx: float, cam: Camera):
     """
     Funkcja sprawdza czy odstęp między zdjęciami jest większy niż cykl kamery.
 
             Argumenty:
-                    bx (float): terenowy wymiar bazy fotografowania w poprzek kierunku lotu
-                    v (float): prędkość lotu
+                    dtx (float): obliczony interwał czasu między zdjęciami
                     cam (Camera): obiekt klasy Camera
             
             Zwraca:
                     bool: True jeśli odstęp jest większy niż cykl, False jeśli nie
     """
-    interval = bx / v
-    if interval >= cam.cycle:
+    if dtx >= cam.cycle:
         return True
     else:
         return False
@@ -141,16 +121,35 @@ def calculate_number_of_photos(nx: int, ny: int):
     """
     return nx * ny
 
-def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float):
+def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
+    """
+    Funkcja oblicza zasięg obszaru opracowania wzdłuż i poprzek kierunku lotu.
+        
+                Argumenty:
+                        point_1 (tuple): współrzędne pierwszego punktu
+                        point_2 (tuple): współrzędne drugiego punktu
+                
+                Zwraca:
+                        Dx, Dy (float): zasięg obszaru opracowania wzdłuż i poprzek kierunku lotu
+    """
+    Dx = abs(point_1[0] - point_2[0])
+    Dy = abs(point_1[1] - point_2[1])
+    return Dx, Dy
+
+def calculate_max_velocity(velocity: float, plane: Plane):
+    pass
+
+def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, plane: Plane, point_1: tuple, point_2: tuple, hmin: float, hmax: float):
     '''
     Funkcja oblicza parametry nalotu.
 
             Argumenty:
                     gsd (float): terenowy rozmiar piksela
                     camera (Camera): obiekt klasy Camera
-                    velocity (float): prędkość lotu
+                    velocity (float): prędkość lotu wybrana przez użytkownika
                     p (float): pokrycie podłużne
                     q (float): pokrycie poprzeczne
+                    plane (Plane): obiekt klasy Plane
 
             Zwraca:
                     height (float): wysokość lotu
@@ -158,15 +157,32 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float):
                     Ly (float): terenowy zasięg zdjęcia wzdłuż kierunku lotu
                     bx (float): terenowy wymiar bazy fotografowania w poprzek kierunku lotu
                     by (float): terenowy wymiar bazy fotografowania wzdłuż kierunku lotu
+                    nx (int): liczba zdjęć w pojedynczym szeregu
+                    ny (int): liczba szeregów
+                    n (int): liczba zdjęć w całym nalocie   
+                    bool_interval (bool): True jeśli odstęp jest większy niż cykl, False jeśli nie
+                    bool_height (bool): True jeśli wysokość jest możliwa, False jeśli nie
 
     '''
     height = calculate_height(gsd, camera)
     Lx, Ly = calculate_range(gsd, camera)
-    bx, by = calculate_base_terrain_dimensions(Ly, Lx, p, q)
-    ny, nx = calculate_amount_of_series(Lx, bx, Ly, by)
+    bx, by = calculate_base(Ly, Lx, p, q)
+    Dx, Dy = calculate_Dx_Dy(point_1, point_2)
+    ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
     n = calculate_number_of_photos(nx, ny)
+    # po zaokrągleniu przelicz ponownie bx by itd
+    dtx = bx / velocity
+    bool_interval = check_interval(dtx, camera)
+    bool_height = check_height(height, hmin, hmax, plane)
+    
+    if bool_interval == False:
+        print("Odstęp między zdjęciami jest mniejszy niż cykl kamery.")
+        # zmniejsz prędkość lotu do największej możliwej
+
+    if bool_height == False:
+        print("Wysokość lotu jest zbyt duża dla wybranego samolotu.")
+        print("Zmień samolot lub zmniejsz wysokość lotu.")
     # skala = calculate_scale(height, camera)
     # Bx = bx * skala
     # By = by * skala
-    # tbx = Bx / velocity
     

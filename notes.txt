@@ -1,9 +1,3 @@
-parametry dla kamer
-lx,
-ly,
-dp,
-ck
-
 
 pokrycie podłużne od 0 do 99% co 0.1%
 pokrycie poprzeczne (odległośc między szeregami) od 0 do 99% co 0.1%
@@ -14,18 +8,6 @@ gsd zmienia się na podstawie wysokości
 czas potrzebny na przelot na podstawie prędkości lotu
 wartość rozmazania można wyznaczyć
 
-dp/GSD = ck/h - odpowiednie jednostki - konwersja do metra
-ltx = lx*gsd
-lty = ly*gsd
-bx = ltx.(100-p)/100
-by = lty.(100-p)/100
-dt = bx/v
+x y wprowadzane w geodezyjnym układzie współrzędnych
 
-kropek nie trzeba malować ani zawijasów
-
-par. kamery: dp - dana wielkość piksela w kamerze, f=ck, lx, ly
-par. zewnętrzne: GSD, p, q, v, zakres H, zakres V do kontroli ?????????????????????????????????????????????
-obliczenia: H(W), bx, by, Bx=bx*skala, By, tbx
-
-
-najpierw wprowadzić gsd 
+my stosujemy układ matematyczny wiec zamieniamy współrzędne
