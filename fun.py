@@ -12,7 +12,7 @@ def calculate_height(gsd: float, camera: Camera) -> float:
             Zwraca:
                     height (float): wysokość lotu
     '''
-    height = camera.focal_length * gsd / camera.pixel_size
+    height = camera.get_focal_length() * gsd / camera.get_pixel_size()
     return height
 
 def calculate_scale(height: float, camera: Camera) -> float:
@@ -26,7 +26,7 @@ def calculate_scale(height: float, camera: Camera) -> float:
             Zwraca:
                     skala (float): skala zdjęcia
     '''
-    skala = camera.focal_length / height
+    skala = camera.get_focal_length() / height
     return skala
 
 def check_height(height: float, hmin: float, hmax: float, plane: Plane) -> bool:
@@ -44,7 +44,7 @@ def check_height(height: float, hmin: float, hmax: float, plane: Plane) -> bool:
     '''
     average_height = (hmin + hmax)/2
     absolutna_height = height + average_height
-    if absolutna_height > plane.ceiling: 
+    if absolutna_height > plane.get_ceiling(): 
         return False
     else:
         return True
@@ -60,8 +60,8 @@ def calculate_range(gsd: float, camera: Camera) -> tuple:
             Zwraca:
                     Lx, Ly (float): terenowe wymiary zdjęcia
     '''
-    Lx = camera.frame_short * gsd
-    Ly = camera.frame_long * gsd
+    Lx = camera.get_frame_short() * gsd
+    Ly = camera.get_frame_long() * gsd
     return Lx, Ly
 
 def calculate_base(Ly: float, Lx: float, p: float, q: float) -> tuple:
@@ -110,7 +110,7 @@ def check_interval(dtx: float, cam: Camera):
             Zwraca:
                     bool: True jeśli odstęp jest większy niż cykl, False jeśli nie
     """
-    if dtx >= cam.cycle:
+    if dtx >= cam.get_cycle():
         return True
     else:
         return False
@@ -136,14 +136,14 @@ def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
     Dy = abs(point_1[1] - point_2[1])
     return Dx, Dy
 
-def calculate_max_velocity(plane: Plane, camera: Camera, bx: float):
-    max_freq = 1.1*(camera.cycle)
+def calculate_max_velocity(camera: Camera, bx: float):
+    max_freq = 1.1*(camera.get_cycle())
     max_velocity = bx / max_freq
     return max_velocity
 
 def calculate_max_height(plane: Plane, hmin: float, hmax: float):
     avg_height = (hmin + hmax)/2
-    height = .9*(plane.ceiling - avg_height)
+    height = .9*(plane.get_ceiling() - avg_height)
     return height
 
 def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: float, Lx: float, Ly: float):
@@ -181,7 +181,7 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
                 Zwraca:
                         gsd (float): terenowy rozmiar piksela
         """
-        gsd = camera.pixel_size * height / camera.focal_length
+        gsd = camera.get_pixel_size() * height / camera.get_focal_length()
         Lx, Ly = calculate_range(gsd, camera)
         bx, by = calculate_base(Ly, Lx, p, q)
         Dx, Dy = calculate_Dx_Dy(point_1, point_2)
@@ -193,7 +193,7 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
 
         if bool_interval == False:
             print("Odstęp czasowy między zdjęciami jest mniejszy niż cykl kamery. Zmniejszam prędkość samolotu.")
-            velocity = calculate_max_velocity(plane, camera, bx)
+            velocity = calculate_max_velocity(camera, bx)
             print(f"Prędkość zmniejszona do {velocity} m/s.")
 
         return gsd, Lx, Ly, bx, by, nx, ny, n, bool_interval
@@ -237,7 +237,7 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     
     if bool_interval == False:
         print("Odstęp czasowy między zdjęciami jest mniejszy niż cykl kamery. Zmniejszam prędkość samolotu.")
-        velocity = calculate_max_velocity(plane, camera, bx)
+        velocity = calculate_max_velocity(camera, bx)
         print(f"Prędkość zmniejszona do {velocity} m/s.")
 
     if bool_height == False:
@@ -251,5 +251,5 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     # Bx = bx * skala
     # By = by * skala
 
-        return height, Lx, Ly, bx, by, nx, ny, n, bool_interval, bool_height
+        return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n
     

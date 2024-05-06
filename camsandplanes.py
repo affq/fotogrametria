@@ -31,6 +31,24 @@ class Camera:
             self.frame_long = 23010
             self.frame_short = 14790
             self.cycle = 1.65
+    
+    def get_pixel_size(self):
+        return self.pixel_size
+    
+    def get_focal_length(self):
+        return self.focal_length
+    
+    def get_frame_long(self):
+        return self.frame_long
+    
+    def get_frame_short(self):
+        return self.frame_short
+    
+    def get_cycle(self):
+        return self.cycle
+    
+    def get_name(self):
+        return self.name
 
 class Plane:
     def __init__(self, name):
@@ -55,4 +73,23 @@ class Plane:
             self.velocity_max = kmhtoms(267)
             self.ceiling = 4572
             self.flight_time = 6
-        self.velocity_avg = (self.velocity_min + self.velocity_max) / 2
+        self.velocity_avg = (self.get_velocity_min() + self.get_velocity_max()) / 2
+
+    def get_velocity_min(self):
+        return self.velocity_min
+
+    def get_velocity_max(self):
+        return self.velocity_max
+    
+    def get_velocity_avg(self):
+        return self.velocity_avg
+    
+    def get_ceiling(self):
+        return self.ceiling
+    
+    def get_flight_time(self):
+        return self.flight_time
+    
+    def get_name(self):
+        return self.name
+    
