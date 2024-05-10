@@ -199,7 +199,6 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
         return gsd, Lx, Ly, bx, by, nx, ny, n, bool_interval
 
 def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, plane: Plane, point_1: tuple, point_2: tuple, hmin: float, hmax: float):
-    
     '''
     Funkcja oblicza parametry nalotu.
 
@@ -225,15 +224,25 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
 
     '''
     height = calculate_height(gsd, camera)
+    print (f"Wysokość lotu: {height} m")
     Lx, Ly = calculate_range(gsd, camera)
+    print (f"Zasięg terenowy zdjęcia: {Lx} x {Ly} m")
     bx, by = calculate_base(Ly, Lx, p, q)
+    print (f"Wymiary bazy fotografowania: {bx} x {by} m")
     Dx, Dy = calculate_Dx_Dy(point_1, point_2)
+    print (f"Zasięg obszaru opracowania: {Dx} x {Dy} m")
     ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
+    print (f"Liczba szeregów: {ny}, liczba zdjęć w pojedynczym szeregu: {nx}")
     bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
+    print (f"Wymiary bazy fotografowania po zaokrągleniu: {bx} x {by} m")
     n = calculate_number_of_photos(nx, ny)
+    print (f"Liczba zdjęć w całym nalocie: {n}")
     dtx = bx / velocity
+    print (f"Odstęp czasowy między zdjęciami: {dtx} s")
     bool_interval = check_interval(dtx, camera)
+    print (f"Odstęp jest większy niż cykl kamery: {bool_interval}")
     bool_height = check_height(height, hmin, hmax, plane)
+    print (f"Wysokość lotu jest możliwa dla wybranego samolotu: {bool_height}")
     
     if bool_interval == False:
         print("Odstęp czasowy między zdjęciami jest mniejszy niż cykl kamery. Zmniejszam prędkość samolotu.")
@@ -247,9 +256,6 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
         gsd, Lx, Ly, bx, by, nx, ny, n, bool_interval = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
         print("Przeliczono ponownie parametry nalotu.")
 
-    # skala = calculate_scale(height, camera)
-    # Bx = bx * skala
-    # By = by * skala
-
-        return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n
+        
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n
     

@@ -128,7 +128,7 @@ class Window:
         self.text_box.insert(tk.END, f" Pokrycie poprzeczne: {self.p_scale.get()},\n")
         self.text_box.insert(tk.END, f" Pokrycie podłużne: {self.q_scale.get()}\n")
         self.text_box.insert(tk.END, f"------------------------------------\n")
-        self.text_box.insert(tk.END, f" Wynik: {calculate(self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(self.velocity_entry.get()), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))}\n")
+        self.text_box.insert(tk.END, f" Wynik: {calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(self.velocity_entry.get()), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))}\n")
         self.text_box.config(state=tk.DISABLED)
 
 if __name__ == "__main__":
