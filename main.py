@@ -10,6 +10,7 @@ class Window:
         self.root = root
         self.root.title("Projektant nalotu fotogrametrycznego")
         self.root.geometry("800x600")
+        self.root.resizable(False, False)
 
         self.options_frame = tk.LabelFrame(self.root, text="Opcje")
         self.options_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10)
@@ -113,22 +114,23 @@ class Window:
 
         self.text_box = tk.Text(self.root, height=30, width=60)
         self.text_box.pack(side=tk.RIGHT, padx=10, pady=20, anchor=tk.NE)
-        self.text_box.insert(tk.END, f"Wyniki obliczeń: \n")
         self.text_box.config(state=tk.DISABLED)
 
     def print_to_text_box(self, event):
         self.text_box.config(state=tk.NORMAL)
-        self.text_box.insert(tk.END, f" Punkt top-left: ({self.top_left_x_entry.get()}, {self.top_left_y_entry.get()}),\n")
-        self.text_box.insert(tk.END, f" Punkt bottom-right: ({self.bottom_right_x_entry.get()}, {self.bottom_right_y_entry.get()}),\n")
-        self.text_box.insert(tk.END, f" Wysokości terenu: {self.min_height_entry.get()} - {self.max_height_entry.get()},\n")
-        self.text_box.insert(tk.END, f" Kamera: {self.camera_combobox.get()},\n")
-        self.text_box.insert(tk.END, f" Samolot: {self.plane_combobox.get()},\n")
-        self.text_box.insert(tk.END, f" Prędkość: {self.velocity_entry.get()},\n")
-        self.text_box.insert(tk.END, f" GSD: {self.gsd_scale.get()},\n")
-        self.text_box.insert(tk.END, f" Pokrycie poprzeczne: {self.p_scale.get()},\n")
-        self.text_box.insert(tk.END, f" Pokrycie podłużne: {self.q_scale.get()}\n")
-        self.text_box.insert(tk.END, f"------------------------------------\n")
-        self.text_box.insert(tk.END, f" Wynik: {calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(self.velocity_entry.get()), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))}\n")
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n = calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(kmhtoms(self.velocity_entry.get())), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))
+        self.text_box.insert(tk.END, f"Obliczone parametry: \n")
+        self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
+        self.text_box.insert(tk.END, f" Wysokość: {int(height)} m n. p. m.\n")
+        self.text_box.insert(tk.END, f" GSD: {int(gsd*100)} cm\n")
+        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu (Lx): {int(Lx)} m\n")
+        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu (Ly): {int(Ly)} m\n")
+        self.text_box.insert(tk.END, f" Baza podłużna (Bx): {int(bx)} m\n")
+        self.text_box.insert(tk.END, f" Baza poprzeczna (By): {int(by)} m\n")
+        self.text_box.insert(tk.END, f" Liczba zdjęć w szeregu: {nx}\n")
+        self.text_box.insert(tk.END, f" Liczba szeregów: {ny}\n")
+        self.text_box.insert(tk.END, f" Liczba zdjęć: {n}\n")
+        self.text_box.insert(tk.END, f"-----------------------------------\n")
         self.text_box.config(state=tk.DISABLED)
 
 if __name__ == "__main__":

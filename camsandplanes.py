@@ -1,6 +1,9 @@
 def kmhtoms(kmh):
     return kmh * (1000 / 3600)
 
+def mstokmh(ms):
+    return ms * (3600 / 1000)
+
 class Camera:
     def __init__(self, name):
         if name == "Z/I DMC IIe 230":
