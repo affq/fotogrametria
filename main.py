@@ -4,6 +4,9 @@ from tkinter import ttk
 import math
 from tkinter.filedialog import asksaveasfile 
 import codecs
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from tkinter import messagebox
 
 class Window:
     def __init__(self, root):
@@ -21,27 +24,26 @@ class Window:
         self.top_left_x.pack(side=tk.LEFT, pady=10)
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_x_entry.insert(0, "0")
+        self.top_left_x_entry.insert(0, "10000")
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
         self.top_left_y_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_y_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_y_entry.insert(0, "0")
+        self.top_left_y_entry.insert(0, "10000")
 
         self.bottom_right_frame = tk.LabelFrame(self.options_frame, text="Prawy dolny róg")
         self.bottom_right_frame.pack(side=tk.TOP, padx=10, pady=10, anchor=tk.NW)
         self.bottom_right_x = ttk.Label(self.bottom_right_frame, text="X:")
         self.bottom_right_x.pack(side=tk.LEFT, pady=10)
         self.bottom_right_x_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_x_entry.insert(0, "19090")
+        self.bottom_right_x_entry.insert(0, "5000")
         self.bottom_right_x_entry.pack(side=tk.LEFT, padx=10)
-
 
         self.bottom_right_y = ttk.Label(self.bottom_right_frame, text="Y:")
         self.bottom_right_y.pack(side=tk.LEFT, pady=10)
         self.bottom_right_y_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_y_entry.insert(0, "17219")
+        self.bottom_right_y_entry.insert(0, "20000")
         self.bottom_right_y_entry.pack(side=tk.LEFT, padx=10)
 
         self.heights_frame = tk.LabelFrame(self.options_frame, text="Wysokości terenu")
@@ -129,8 +131,58 @@ class Window:
         self.clear_button.pack(side=tk.LEFT, pady=10, padx=25)
         self.clear_button.bind("<Button-1>", self.clear)
 
+# Cześć graficzna 
+# Cześć graficzna powinna zostać wykonana na mapie topograficznej i zawie-
+# rać następujące elementy: 
+#1. Granice opracowywanego obiektu (zielony, ciągły gr. 1 mm) 
+#2. Granice ortofotomapy wg. sekcji (niebieski, ciągły gr. 0.2mm) 
+#3. Osie szeregów i punkty nadirowe (czerwony, ciągły, gr. 0.3 mm) 
+#4. Numeracja szeregów (cyfry czerwone wys. 6 mm) 
+#5. Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
+# (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
+# cach linii, dł. 1 cm w kierunku lotu) 
+#6. Kierunek północy  Cześć  graficzna  powinna  zostać  wykonana  w  formie  elektronicznej  i  prze-
+# słana  wraz  z  częścią  obliczeniową,  na  adres  mailowy  prowadzącego,  w  po-
+# staci pdf. 
     def draw(self, event):
-        pass
+        try:
+            dx = float(self.bottom_right_x_entry.get()) - float(self.top_left_x_entry.get())
+            dy = float(self.bottom_right_y_entry.get()) - float(self.top_left_y_entry.get())
+            gsd = .01*self.gsd_scale.get()
+            camera = Camera(self.camera_combobox.get())
+            p = float(self.p_scale.get())
+            q = float(self.q_scale.get())
+            plane = Plane(self.plane_combobox.get())
+            point_1 = (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get()))
+            point_2 = (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get()))
+            velocity = float(kmhtoms(self.velocity_entry.get()))
+            hmin = float(self.min_height_entry.get())
+            hmax = float(self.max_height_entry.get())
+        except ValueError:
+            messagebox.showerror("Błąd", "Wprowadź poprawne wartości")
+    
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        fig, ax = plt.subplots()
+
+
+        for y in range (0, ny):
+            for x in range(0, nx):
+                rect = patches.Rectangle((float(self.top_left_y_entry.get()) + x*bx, float(self.top_left_x_entry.get()) - y*by), bx, -by, linewidth=1, edgecolor='r', facecolor='none')
+                ax.add_patch(rect)
+
+        rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')
+        ax.add_patch(rect)
+        
+        ax.autoscale()
+
+#5. Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
+# (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
+# cach linii, dł. 1 cm w kierunku lotu) 
+
+        plt.show()
+        
+            
+    
 
     def save(self, event):
         file = asksaveasfile(filetypes=[("Text files", "*.txt")], defaultextension=".txt", initialfile="wynik")
