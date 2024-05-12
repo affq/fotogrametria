@@ -5,10 +5,6 @@ def calculate_height(gsd: float, camera: Camera) -> float:
     height = camera.get_focal_length() * gsd / camera.get_pixel_size()
     return height
 
-def calculate_scale(height: float, camera: Camera) -> float:
-    skala = camera.get_focal_length() / height
-    return skala
-
 def check_height(height: float, hmin: float, hmax: float, plane: Plane) -> bool:
     average_height = (hmin + hmax)/2
     absolutna_height = height + average_height
@@ -38,9 +34,6 @@ def check_interval(dtx: float, cam: Camera):
     else:
         return False
 
-def calculate_number_of_photos(nx: int, ny: int):
-    return nx * ny
-
 def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
     Dx = abs(point_1[0] - point_2[0])
     Dy = abs(point_1[1] - point_2[1])
@@ -49,13 +42,13 @@ def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
 def calculate_max_velocity(camera: Camera, bx: float):
     max_freq = camera.get_cycle()
     max_velocity = bx / max_freq
-    limit = .9
+    limit = .95
     return limit * max_velocity
 
 def calculate_max_height(plane: Plane, hmin: float, hmax: float):
     avg_height = (hmin + hmax)/2
     height = plane.get_ceiling() - avg_height
-    limit = .9
+    limit = .95
     return limit * height
 
 def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: float, Lx: float, Ly: float):
@@ -72,17 +65,17 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
         Dx, Dy = calculate_Dx_Dy(point_1, point_2)
         ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
         bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
-        n = calculate_number_of_photos(nx, ny)
+        n = nx * ny
 
         if velocity > plane.get_velocity_max():
                 velocity = .95* plane.get_velocity_max()
-                print("Prędkość samolotu jest zbyt duża dla wybranego samolotu. Zmniejszam prędkość.")
+                print("Prędkość jest zbyt duża dla wybranego samolotu. Zmniejszam prędkość.")
 
         dtx = bx / velocity
 
         if dtx < camera.get_cycle():
                 velocity = calculate_max_velocity(camera, bx)
-                print(f"Prędkość zmniejszona do {mstokmh(velocity)} m/s.")
+                print(f"Kamera nie nadąża. Prędkość zmniejszona.")
 
         return gsd, Lx, Ly, bx, by, nx, ny, n
 
@@ -94,7 +87,7 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     Dx, Dy = calculate_Dx_Dy(point_1, point_2)
     ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
     bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
-    n = calculate_number_of_photos(nx, ny)
+    n = nx * ny
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()
@@ -105,13 +98,20 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
 
     if bool_interval == False:
         velocity = calculate_max_velocity(camera, bx)
-        print(f"Prędkość zmniejszona do {mstokmh(velocity)} km/h.")
+        print(f"Interwał zbyt mały. Prędkość zmniejszona.")
 
     if bool_height == False:
         height = calculate_max_height(plane, hmin, hmax)
-        print(f"Zmniejszono wysokość lotu do {height} m n. p. m.")
+        print(f"Zbyt duża wysokość. Zmniejszono wysokość lotu.")
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
         print("Przeliczono ponownie parametry nalotu.")
      
     return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n
-    
+
+def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
+    limit = 1.05
+    min_interval = limit * bx / plane.get_velocity_max()
+    n = nx * ny
+    time = (n - 1) * min_interval + 140 * (ny - 1)
+    return time
+

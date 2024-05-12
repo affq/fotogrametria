@@ -1,9 +1,9 @@
 from fun import *
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
 from tkinter import ttk
-
+import math
+from tkinter.filedialog import asksaveasfile 
+import codecs
 
 class Window:
     def __init__(self, root):
@@ -22,7 +22,6 @@ class Window:
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
         self.top_left_x_entry.insert(0, "0")
-
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
@@ -110,15 +109,56 @@ class Window:
         
         self.calculate_button = tk.Button(self.options_frame, text="Oblicz", width=15)
         self.calculate_button.pack(side=tk.TOP, pady=10)
-        self.calculate_button.bind("<Button-1>", self.print_to_text_box)
+        self.calculate_button.bind("<Button-1>", self.calculate_and_print)
 
-        self.text_box = tk.Text(self.root, height=30, width=60)
-        self.text_box.pack(side=tk.RIGHT, padx=10, pady=20, anchor=tk.NE)
+        self.textbox_frame = tk.Frame(self.root)
+        self.textbox_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=10, pady=10)
+        self.text_box = tk.Text(self.textbox_frame, height=30, width=80)
+        self.text_box.pack(side=tk.TOP, fill=tk.BOTH, padx=10, pady=10)
         self.text_box.config(state=tk.DISABLED)
 
-    def print_to_text_box(self, event):
+        self.draw_button = tk.Button(self.textbox_frame, text="Rysuj mapę", width=15)
+        self.draw_button.pack(side=tk.LEFT, pady=10, padx=25)
+        self.draw_button.bind("<Button-1>", self.draw)
+
+        self.save_button = tk.Button(self.textbox_frame, text="Zapisz wynik", width=15)
+        self.save_button.pack(side=tk.LEFT, pady=10, padx=25)
+        self.save_button.bind("<Button-1>", self.save)
+
+        self.clear_button = tk.Button(self.textbox_frame, text="Wyczyść", width=15)
+        self.clear_button.pack(side=tk.LEFT, pady=10, padx=25)
+        self.clear_button.bind("<Button-1>", self.clear)
+
+    def draw(self, event):
+        pass
+
+    def save(self, event):
+        file = asksaveasfile(filetypes=[("Text files", "*.txt")], defaultextension=".txt", initialfile="wynik")
+        if file is None:
+            return
+        with codecs.open(file.name, "w", "utf-8") as f:
+            f.write(self.text_box.get("1.0", tk.END))
+    
+    def clear(self, event):
         self.text_box.config(state=tk.NORMAL)
+        self.text_box.delete("1.0", tk.END)
+        self.text_box.config(state=tk.DISABLED)
+
+    def calculate_and_print(self, event):
+        self.text_box.config(state=tk.NORMAL)
+        self.text_box.insert(tk.END, f"Wczytane parametry: \n")
+        self.text_box.insert(tk.END, f" Lewy górny róg: ({self.top_left_y_entry.get()}, {self.top_left_x_entry.get()})\n")
+        self.text_box.insert(tk.END, f" Prawy dolny róg: ({self.bottom_right_y_entry.get()}, {self.bottom_right_x_entry.get()})\n")
+        self.text_box.insert(tk.END, f" Wysokości terenu: {self.min_height_entry.get()} - {self.max_height_entry.get()} m n. p. m.\n")
+        self.text_box.insert(tk.END, f" Kamera: {self.camera_combobox.get()}\n")
+        self.text_box.insert(tk.END, f" Samolot: {self.plane_combobox.get()}\n")
+        self.text_box.insert(tk.END, f" Prędkość: {self.velocity_entry.get()} km/h\n")
+        self.text_box.insert(tk.END, f" GSD: {self.gsd_scale.get()} cm\n")
+        self.text_box.insert(tk.END, f" Pokrycie poprzeczne: {self.p_scale.get()} %\n")
+        self.text_box.insert(tk.END, f" Pokrycie podłużne: {self.q_scale.get()} %\n")
+        self.text_box.insert(tk.END, f" ----------------------------------- \n")
         velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n = calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(kmhtoms(self.velocity_entry.get())), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))
+        self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
         self.text_box.insert(tk.END, f" Wysokość: {int(height)} m n. p. m.\n")
@@ -131,6 +171,8 @@ class Window:
         self.text_box.insert(tk.END, f" Liczba szeregów: {ny}\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć: {n}\n")
         self.text_box.insert(tk.END, f"-----------------------------------\n")
+        self.flight_time = calculate_time(nx, ny, bx, Plane(self.plane_combobox.get()))
+        self.text_box.insert(tk.END, f" Minimalny czas nalotu: {math.ceil(self.flight_time / 60)} min + droga z oraz do lotniska\n")
         self.text_box.config(state=tk.DISABLED)
 
 if __name__ == "__main__":
