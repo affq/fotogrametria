@@ -175,9 +175,13 @@ class Window:
         
         ax.autoscale()
 
-#5. Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
-# (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
-# cach linii, dł. 1 cm w kierunku lotu) 
+    # 3. Osie szeregów i punkty nadirowe (czerwony, ciągły, gr. 0.3 mm)
+        for y in range (0, ny):
+            for x in range(0, nx):
+                pass
+                # draw axis in the middles of the rectangles
+                # ax.plot([float(self.top_left_x_entry.get()) + x*bx, float(self.top_left_x_entry.get()) + x*bx + bx], [float(self.top_left_y_entry.get()) - y*by - by/2, float(self.top_left_y_entry.get()) - y*by - by/2], color='r', linewidth=0.3)
+
 
         plt.show()
         
