@@ -90,7 +90,6 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     ny, nx = calculate_amount_of_series(Dx, bx0, Dy, by0)
     bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
-    print(p, q)
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()

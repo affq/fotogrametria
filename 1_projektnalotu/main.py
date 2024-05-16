@@ -149,9 +149,8 @@ class Window:
         except ValueError:
             messagebox.showerror("Błąd", "Wprowadź poprawne wartości")
     
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _ = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
         fig, ax = plt.subplots()
-
 
         for y in range (0, ny):
             for x in range(0, nx):
@@ -160,22 +159,9 @@ class Window:
 
         rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')
         ax.add_patch(rect)
-        
         ax.autoscale()
-
-    # 3. Osie szeregów i punkty nadirowe (czerwony, ciągły, gr. 0.3 mm)
-        for y in range (0, ny):
-            for x in range(0, nx):
-                pass
-                # draw axis in the middles of the rectangles
-                # ax.plot([float(self.top_left_x_entry.get()) + x*bx, float(self.top_left_x_entry.get()) + x*bx + bx], [float(self.top_left_y_entry.get()) - y*by - by/2, float(self.top_left_y_entry.get()) - y*by - by/2], color='r', linewidth=0.3)
-
-
         plt.show()
         
-            
-    
-
     def save(self, event):
         file = asksaveasfile(filetypes=[("Text files", "*.txt")], defaultextension=".txt", initialfile="wynik")
         if file is None:
