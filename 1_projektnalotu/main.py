@@ -24,26 +24,26 @@ class Window:
         self.top_left_x.pack(side=tk.LEFT, pady=10)
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_x_entry.insert(0, "10000")
+        self.top_left_x_entry.insert(0, "19090")
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
         self.top_left_y_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_y_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_y_entry.insert(0, "10000")
+        self.top_left_y_entry.insert(0, "0")
 
         self.bottom_right_frame = tk.LabelFrame(self.options_frame, text="Prawy dolny róg")
         self.bottom_right_frame.pack(side=tk.TOP, padx=10, pady=10, anchor=tk.NW)
         self.bottom_right_x = ttk.Label(self.bottom_right_frame, text="X:")
         self.bottom_right_x.pack(side=tk.LEFT, pady=10)
         self.bottom_right_x_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_x_entry.insert(0, "5000")
+        self.bottom_right_x_entry.insert(0, "0")
         self.bottom_right_x_entry.pack(side=tk.LEFT, padx=10)
 
         self.bottom_right_y = ttk.Label(self.bottom_right_frame, text="Y:")
         self.bottom_right_y.pack(side=tk.LEFT, pady=10)
         self.bottom_right_y_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_y_entry.insert(0, "20000")
+        self.bottom_right_y_entry.insert(0, "17219")
         self.bottom_right_y_entry.pack(side=tk.LEFT, padx=10)
 
         self.heights_frame = tk.LabelFrame(self.options_frame, text="Wysokości terenu")
@@ -98,7 +98,7 @@ class Window:
         self.p_label = ttk.Label(self.p_frame, text="Pokrycie poprzeczne:")
         self.p_label.pack(side=tk.LEFT, pady=10)
         self.p_scale = tk.Scale(self.p_frame, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL)
-        self.p_scale.set(30)
+        self.p_scale.set(60)
         self.p_scale.pack(side=tk.LEFT, padx=10)
 
         self.q_frame = tk.Frame(self.options_frame)
@@ -106,7 +106,7 @@ class Window:
         self.q_label = ttk.Label(self.q_frame, text="Pokrycie podłużne:")
         self.q_label.pack(side=tk.LEFT, pady=10)
         self.q_scale = tk.Scale(self.q_frame, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL)
-        self.q_scale.set(60)
+        self.q_scale.set(30)
         self.q_scale.pack(side=tk.LEFT, padx=10)
         
         self.calculate_button = tk.Button(self.options_frame, text="Oblicz", width=15)
@@ -131,19 +131,7 @@ class Window:
         self.clear_button.pack(side=tk.LEFT, pady=10, padx=25)
         self.clear_button.bind("<Button-1>", self.clear)
 
-# Cześć graficzna 
-# Cześć graficzna powinna zostać wykonana na mapie topograficznej i zawie-
-# rać następujące elementy: 
-#1. Granice opracowywanego obiektu (zielony, ciągły gr. 1 mm) 
-#2. Granice ortofotomapy wg. sekcji (niebieski, ciągły gr. 0.2mm) 
-#3. Osie szeregów i punkty nadirowe (czerwony, ciągły, gr. 0.3 mm) 
-#4. Numeracja szeregów (cyfry czerwone wys. 6 mm) 
-#5. Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
-# (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
-# cach linii, dł. 1 cm w kierunku lotu) 
-#6. Kierunek północy  Cześć  graficzna  powinna  zostać  wykonana  w  formie  elektronicznej  i  prze-
-# słana  wraz  z  częścią  obliczeniową,  na  adres  mailowy  prowadzącego,  w  po-
-# staci pdf. 
+
     def draw(self, event):
         try:
             dx = float(self.bottom_right_x_entry.get()) - float(self.top_left_x_entry.get())
@@ -213,7 +201,7 @@ class Window:
         self.text_box.insert(tk.END, f" Pokrycie poprzeczne: {self.p_scale.get()} %\n")
         self.text_box.insert(tk.END, f" Pokrycie podłużne: {self.q_scale.get()} %\n")
         self.text_box.insert(tk.END, f" ----------------------------------- \n")
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n = calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(kmhtoms(self.velocity_entry.get())), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0 = calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(kmhtoms(self.velocity_entry.get())), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
@@ -221,6 +209,10 @@ class Window:
         self.text_box.insert(tk.END, f" GSD: {int(gsd*100)} cm\n")
         self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu (Lx): {int(Lx)} m\n")
         self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu (Ly): {int(Ly)} m\n")
+        self.text_box.insert(tk.END, f" Baza podłużna przed ceilingiem(bx): {round(bx0)} m\n")
+        self.text_box.insert(tk.END, f" Baza poprzeczna przed ceilingiem(by): {round(by0)} m\n")
+        self.text_box.insert(tk.END, f" Pokrycie poprzeczne (p): {round(p,1)} %\n")
+        self.text_box.insert(tk.END, f" Pokrycie podłużne (q): {round(q,1)} %\n")
         self.text_box.insert(tk.END, f" Baza podłużna (Bx): {int(bx)} m\n")
         self.text_box.insert(tk.END, f" Baza poprzeczna (By): {int(by)} m\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć w szeregu: {nx}\n")

@@ -24,8 +24,9 @@ def calculate_base(Ly: float, Lx: float, p: float, q: float) -> tuple:
     return bx, by
 
 def calculate_amount_of_series(Dx: float, bx: float, Dy: float, by: float)-> tuple:
-    ny = math.ceil(Dy/by)
-    nx = math.ceil(Dx/bx + 4)
+    # Dx <=> Dy
+    ny = math.ceil(Dx/by)
+    nx = math.ceil(Dy/bx + 4)
     return ny, nx
 
 def check_interval(dtx: float, cam: Camera):
@@ -52,8 +53,9 @@ def calculate_max_height(plane: Plane, hmin: float, hmax: float):
     return limit * height
 
 def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: float, Lx: float, Ly: float):
-    by = Dy/ny
-    bx = Dx/nx - 4
+    # tu też xd
+    by = Dx/ny
+    bx = Dy/(nx - 4)
     p = 100 - 100*bx/Lx
     q = 100 - 100*by/Ly
     return bx, by, p, q
@@ -83,11 +85,12 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     height = calculate_height(gsd, camera)
     bool_height = check_height(height, hmin, hmax, plane)    
     Lx, Ly = calculate_range(gsd, camera)
-    bx, by = calculate_base(Ly, Lx, p, q)
+    bx0, by0 = calculate_base(Ly, Lx, p, q)
     Dx, Dy = calculate_Dx_Dy(point_1, point_2)
-    ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
-    bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
+    ny, nx = calculate_amount_of_series(Dx, bx0, Dy, by0)
+    bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
+    print(p, q)
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()
@@ -106,7 +109,7 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
         print("Przeliczono ponownie parametry nalotu.")
      
-    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0
 
 def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
     limit = 1.05
