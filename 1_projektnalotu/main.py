@@ -141,8 +141,8 @@ class Window:
             p = float(self.p_scale.get())
             q = float(self.q_scale.get())
             plane = Plane(self.plane_combobox.get())
-            point_1 = (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get()))
-            point_2 = (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get()))
+            point_1 = (float(self.top_left_x_entry.get()), float(self.top_left_y_entry.get())) # x, y
+            point_2 = (float(self.bottom_right_x_entry.get()), float(self.bottom_right_y_entry.get())) # x, y
             velocity = float(kmhtoms(self.velocity_entry.get()))
             hmin = float(self.min_height_entry.get())
             hmax = float(self.max_height_entry.get())
@@ -150,13 +150,13 @@ class Window:
             messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
             return
 
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, comms = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, _, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, _ = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
 
         fig, ax = plt.subplots()
 
-        for y in range (0, ny):
-            for x in range(0, nx):
-                rect = patches.Rectangle((float(self.top_left_y_entry.get()) + x*bx, float(self.top_left_x_entry.get()) - y*by), bx, -by, linewidth=1, edgecolor='r', facecolor='none')
+        for szereg in range (0, ny):
+            for zdjecie in range(0, nx):
+                rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), by, bx, linewidth=1, edgecolor='r', facecolor='none')
                 ax.add_patch(rect)
 
         rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')

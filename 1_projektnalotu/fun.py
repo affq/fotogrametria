@@ -18,16 +18,15 @@ def calculate_range(gsd: float, camera: Camera) -> tuple:
     Ly = camera.get_frame_long() * gsd
     return Lx, Ly
 
-def calculate_base(Ly: float, Lx: float, p: float, q: float) -> tuple:
+def calculate_base(Lx: float, Ly: float, p: float, q: float) -> tuple:
     bx = Lx * ((100-p)/100)
     by = Ly * ((100-q)/100)
     return bx, by
 
-def calculate_amount_of_series(Dx: float, bx: float, Dy: float, by: float)-> tuple:
-    # Dx <=> Dy
-    ny = math.ceil(Dx/by)
-    nx = math.ceil(Dy/bx + 4)
-    return ny, nx
+def calculate_amount_of_series(bx, by, Dx, Dy):
+    ny = math.ceil(Dy/by)
+    nx = math.ceil(Dx/bx + 4)
+    return nx, ny
 
 def check_interval(dtx: float, cam: Camera):
     if dtx >= cam.get_cycle():
@@ -36,9 +35,12 @@ def check_interval(dtx: float, cam: Camera):
         return False
 
 def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
-    Dx = abs(point_1[0] - point_2[0])
-    Dy = abs(point_1[1] - point_2[1])
-    return Dx, Dy
+    length_1 = abs(point_1[0] - point_2[0])
+    length_2 = abs(point_1[1] - point_2[1])
+    if length_1 >= length_2:
+         return length_1, length_2
+    else:
+        return length_2, length_1
 
 def calculate_max_velocity(camera: Camera, bx: float):
     max_freq = camera.get_cycle()
@@ -54,8 +56,8 @@ def calculate_max_height(plane: Plane, hmin: float, hmax: float):
 
 def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: float, Lx: float, Ly: float):
     # tu też xd
-    by = Dx/ny
-    bx = Dy/(nx - 4)
+    by = Dy/ny
+    bx = Dx/(nx - 4)
     p = 100 - 100*bx/Lx
     q = 100 - 100*by/Ly
     return bx, by, p, q
@@ -63,9 +65,9 @@ def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: flo
 def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: float, plane: Plane, point_1: tuple, point_2: tuple, hmin: float, hmax: float, height: float):
         gsd = camera.get_pixel_size() * height / camera.get_focal_length()
         Lx, Ly = calculate_range(gsd, camera)
-        bx, by = calculate_base(Ly, Lx, p, q)
+        bx, by = calculate_base(Lx, Ly, p, q)
         Dx, Dy = calculate_Dx_Dy(point_1, point_2)
-        ny, nx = calculate_amount_of_series(Dx, bx, Dy, by)
+        nx, ny = calculate_amount_of_series(bx, by, Dx, Dy)
         bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
         n = nx * ny
 
@@ -81,11 +83,11 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
 
 def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, plane: Plane, point_1: tuple, point_2: tuple, hmin: float, hmax: float):
     height = calculate_height(gsd, camera)
-    bool_height = check_height(height, hmin, hmax, plane)    
-    Lx, Ly = calculate_range(gsd, camera)
-    bx0, by0 = calculate_base(Ly, Lx, p, q)
+    bool_height = check_height(height, hmin, hmax, plane)
     Dx, Dy = calculate_Dx_Dy(point_1, point_2)
-    ny, nx = calculate_amount_of_series(Dx, bx0, Dy, by0)
+    Lx, Ly = calculate_range(gsd, camera)
+    bx0, by0 = calculate_base(Lx, Ly, p, q)
+    nx, ny = calculate_amount_of_series(bx0, by0, Dx, Dy)
     bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
     comms = []
