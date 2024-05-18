@@ -71,13 +71,11 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
 
         if velocity > plane.get_velocity_max():
                 velocity = .95* plane.get_velocity_max()
-                print("Prędkość jest zbyt duża dla wybranego samolotu. Zmniejszam prędkość.")
 
         dtx = bx / velocity
 
         if dtx < camera.get_cycle():
                 velocity = calculate_max_velocity(camera, bx)
-                print(f"Kamera nie nadąża. Prędkość zmniejszona.")
 
         return gsd, Lx, Ly, bx, by, nx, ny, n
 
@@ -90,25 +88,24 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     ny, nx = calculate_amount_of_series(Dx, bx0, Dy, by0)
     bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
+    comms = []
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()
-        print("Prędkość jest zbyt duża dla wybranego samolotu. Zmniejszam prędkość.")
+        comms.append("Wybrana prędkość jest zbyt duża dla wybranego samolotu. Zmniejszono prędkość.")
 
     dtx = bx / velocity
     bool_interval = check_interval(dtx, camera)
 
     if bool_interval == False:
         velocity = calculate_max_velocity(camera, bx)
-        print(f"Interwał zbyt mały. Prędkość zmniejszona.")
+        comms.append("Interwał czasu pomiędzy ekspozycjami jest mniejszy od cyklu pracy kamery. Zmniejszono prędkość.")
 
     if bool_height == False:
         height = calculate_max_height(plane, hmin, hmax)
-        print(f"Zbyt duża wysokość. Zmniejszono wysokość lotu.")
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
-        print("Przeliczono ponownie parametry nalotu.")
      
-    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms
 
 def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
     limit = 1.05

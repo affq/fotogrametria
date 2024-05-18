@@ -81,7 +81,7 @@ class Window:
         self.velocity_label = ttk.Label(self.velocity_frame, text="Prędkość:")
         self.velocity_label.pack(side=tk.LEFT, pady=10)
         self.velocity_entry = tk.Scale(self.velocity_frame, from_=1, to=428, resolution=1, orient=tk.HORIZONTAL)
-        self.velocity_entry.set(132)
+        self.velocity_entry.set(428)
         self.velocity_entry.pack(side=tk.LEFT, padx=10)
 
 
@@ -146,10 +146,12 @@ class Window:
             velocity = float(kmhtoms(self.velocity_entry.get()))
             hmin = float(self.min_height_entry.get())
             hmax = float(self.max_height_entry.get())
-        except ValueError:
-            messagebox.showerror("Błąd", "Wprowadź poprawne wartości")
-    
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _ = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        except Exception as e:
+            messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
+            return
+
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, comms = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+
         fig, ax = plt.subplots()
 
         for y in range (0, ny):
@@ -161,6 +163,7 @@ class Window:
         ax.add_patch(rect)
         ax.autoscale()
         plt.show()
+
         
     def save(self, event):
         file = asksaveasfile(filetypes=[("Text files", "*.txt")], defaultextension=".txt", initialfile="wynik")
@@ -175,36 +178,41 @@ class Window:
         self.text_box.config(state=tk.DISABLED)
 
     def calculate_and_print(self, event):
+        try:
+            gsd = .01*self.gsd_scale.get()
+            camera = Camera(self.camera_combobox.get())
+            velocity = float(kmhtoms(self.velocity_entry.get()))
+            p = float(self.p_scale.get())
+            q = float(self.q_scale.get())
+            plane = Plane(self.plane_combobox.get())
+            point_1 = (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get()))
+            point_2 = (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get()))
+            hmin = float(self.min_height_entry.get())
+            hmax = float(self.max_height_entry.get())
+        except Exception as e:
+            messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
+            return
+
         self.text_box.config(state=tk.NORMAL)
-        self.text_box.insert(tk.END, f"Wczytane parametry: \n")
-        self.text_box.insert(tk.END, f" Lewy górny róg: ({self.top_left_y_entry.get()}, {self.top_left_x_entry.get()})\n")
-        self.text_box.insert(tk.END, f" Prawy dolny róg: ({self.bottom_right_y_entry.get()}, {self.bottom_right_x_entry.get()})\n")
-        self.text_box.insert(tk.END, f" Wysokości terenu: {self.min_height_entry.get()} - {self.max_height_entry.get()} m n. p. m.\n")
-        self.text_box.insert(tk.END, f" Kamera: {self.camera_combobox.get()}\n")
-        self.text_box.insert(tk.END, f" Samolot: {self.plane_combobox.get()}\n")
-        self.text_box.insert(tk.END, f" Prędkość: {self.velocity_entry.get()} km/h\n")
-        self.text_box.insert(tk.END, f" GSD: {self.gsd_scale.get()} cm\n")
-        self.text_box.insert(tk.END, f" Pokrycie poprzeczne: {self.p_scale.get()} %\n")
-        self.text_box.insert(tk.END, f" Pokrycie podłużne: {self.q_scale.get()} %\n")
-        self.text_box.insert(tk.END, f" ----------------------------------- \n")
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0 = calculate(.01*self.gsd_scale.get(), Camera(self.camera_combobox.get()), float(kmhtoms(self.velocity_entry.get())), float(self.p_scale.get()), float(self.q_scale.get()), Plane(self.plane_combobox.get()), (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get())), float(self.min_height_entry.get()), float(self.max_height_entry.get()))
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
         self.text_box.insert(tk.END, f" Wysokość: {int(height)} m n. p. m.\n")
-        self.text_box.insert(tk.END, f" GSD: {int(gsd*100)} cm\n")
-        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu (Lx): {int(Lx)} m\n")
-        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu (Ly): {int(Ly)} m\n")
-        self.text_box.insert(tk.END, f" Baza podłużna przed ceilingiem(bx): {round(bx0)} m\n")
-        self.text_box.insert(tk.END, f" Baza poprzeczna przed ceilingiem(by): {round(by0)} m\n")
-        self.text_box.insert(tk.END, f" Pokrycie poprzeczne (p): {round(p,1)} %\n")
-        self.text_box.insert(tk.END, f" Pokrycie podłużne (q): {round(q,1)} %\n")
-        self.text_box.insert(tk.END, f" Baza podłużna (Bx): {int(bx)} m\n")
-        self.text_box.insert(tk.END, f" Baza poprzeczna (By): {int(by)} m\n")
+        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu: {int(Lx)} m\n")
+        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu: {int(Ly)} m\n")
+        self.text_box.insert(tk.END, f" Baza podłużna: {round(bx0)} m\n")
+        self.text_box.insert(tk.END, f" Baza poprzeczna: {round(by0)} m\n")
+        self.text_box.insert(tk.END, f" Nowe pokrycie poprzeczne (p): {round(p,1)} %\n")
+        self.text_box.insert(tk.END, f" Nowe pokrycie podłużne (q): {round(q,1)} %\n")
+        self.text_box.insert(tk.END, f" Nowa baza podłużna: {int(bx)} m\n")
+        self.text_box.insert(tk.END, f" Nowa baza poprzeczna: {int(by)} m\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć w szeregu: {nx}\n")
         self.text_box.insert(tk.END, f" Liczba szeregów: {ny}\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć: {n}\n")
         self.text_box.insert(tk.END, f"-----------------------------------\n")
+        for comm in comms:
+            messagebox.showinfo("Uwaga!", comm)
         self.flight_time = calculate_time(nx, ny, bx, Plane(self.plane_combobox.get()))
         self.text_box.insert(tk.END, f" Minimalny czas nalotu: {math.ceil(self.flight_time / 60)} min + droga z oraz do lotniska\n")
         self.text_box.config(state=tk.DISABLED)
