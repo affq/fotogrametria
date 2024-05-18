@@ -91,6 +91,11 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
     comms = []
+    if Dx >= Dy:
+         global orientation
+         orientation = "v"
+    else:
+        orientation = "h"
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()
@@ -107,7 +112,7 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
         height = calculate_max_height(plane, hmin, hmax)
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
      
-    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation
 
 def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
     limit = 1.05

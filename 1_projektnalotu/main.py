@@ -150,17 +150,22 @@ class Window:
             messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
             return
 
-        velocity, _, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, _ = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, _, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, _, orientation = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
 
         fig, ax = plt.subplots()
 
-        for szereg in range (0, ny):
-            for zdjecie in range(0, nx):
-                rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), by, bx, linewidth=1, edgecolor='r', facecolor='none')
-                ax.add_patch(rect)
+        if orientation == 'v':
+            for szereg in range(ny):
+                for zdjecie in range(nx-4):
+                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) - (zdjecie+1) * bx), by, bx, linewidth=1, edgecolor='r', facecolor='none'))
 
-        rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')
-        ax.add_patch(rect)
+            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')
+            ax.add_patch(rect)
+
+        else:
+            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dx, dy, linewidth=3, edgecolor='g', facecolor='none')
+        # ax.add_patch(rect)
+
         ax.autoscale()
         plt.show()
 
@@ -194,7 +199,7 @@ class Window:
             return
 
         self.text_box.config(state=tk.NORMAL)
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
@@ -210,6 +215,7 @@ class Window:
         self.text_box.insert(tk.END, f" Liczba zdjęć w szeregu: {nx}\n")
         self.text_box.insert(tk.END, f" Liczba szeregów: {ny}\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć: {n}\n")
+        self.text_box.insert(tk.END, f" Kierunek lotu: {orientation}\n")
         self.text_box.insert(tk.END, f"-----------------------------------\n")
         for comm in comms:
             messagebox.showinfo("Uwaga!", comm)
