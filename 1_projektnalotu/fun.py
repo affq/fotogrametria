@@ -109,10 +109,18 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     if bool_height == False:
         height = calculate_max_height(plane, hmin, hmax)
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
-    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy
+    
+    k = K(bx, by, n, Dx, Dy)
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy, k
 
 def calculate_time(n, ny, bx, velocity) -> float:
     arc_time = 140*(ny-1)
     time = (n * bx) / velocity + arc_time
     return time
+
+def K(bx, by, n, Dx, Dy) -> float:
+    pn = bx * by
+    pt = Dx * Dy
+    k = n * pn / pt
+    return k
 

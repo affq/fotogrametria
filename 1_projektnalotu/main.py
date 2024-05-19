@@ -24,7 +24,7 @@ class Window:
         self.top_left_x.pack(side=tk.LEFT, pady=10)
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_x_entry.insert(0, "20000")
+        self.top_left_x_entry.insert(0, "19090")
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
@@ -43,7 +43,7 @@ class Window:
         self.bottom_right_y = ttk.Label(self.bottom_right_frame, text="Y:")
         self.bottom_right_y.pack(side=tk.LEFT, pady=10)
         self.bottom_right_y_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_y_entry.insert(0, "20000")
+        self.bottom_right_y_entry.insert(0, "17219")
         self.bottom_right_y_entry.pack(side=tk.LEFT, padx=10)
 
         self.heights_frame = tk.LabelFrame(self.options_frame, text="Wysokości terenu")
@@ -148,7 +148,7 @@ class Window:
             messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
             return
 
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy, k = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
 
         fig, ax = plt.subplots()
         if orientation == 'v':
@@ -174,8 +174,6 @@ class Window:
                 ax.add_patch(arc)
             
             for szereg in range(2, ny, 2):
-                if szereg == ny - 1:
-                    continue
                 arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) + 1.5*bx), by, 2*bx, angle=0, theta1=0, theta2=180, color='r')
                 ax.add_patch(arc)
 
@@ -259,15 +257,15 @@ class Window:
             return
 
         self.text_box.config(state=tk.NORMAL)
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy, k = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
         self.text_box.insert(tk.END, f" Wysokość: {int(height)} m n. p. m.\n")
-        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu: {int(Lx)} m\n")
-        self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu: {int(Ly)} m\n")
-        self.text_box.insert(tk.END, f" Baza podłużna: {round(bx0)} m\n")
-        self.text_box.insert(tk.END, f" Baza poprzeczna: {round(by0)} m\n")
+        # self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wzdłuż kierunku lotu: {int(Lx)} m\n")
+        # self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu: {int(Ly)} m\n")
+        # self.text_box.insert(tk.END, f" Baza podłużna: {round(bx0)} m\n")
+        # self.text_box.insert(tk.END, f" Baza poprzeczna: {round(by0)} m\n")
         self.text_box.insert(tk.END, f" Nowe pokrycie poprzeczne (p): {round(p,1)} %\n")
         self.text_box.insert(tk.END, f" Nowe pokrycie podłużne (q): {round(q,1)} %\n")
         self.text_box.insert(tk.END, f" Nowa baza podłużna: {int(bx)} m\n")
@@ -276,6 +274,7 @@ class Window:
         self.text_box.insert(tk.END, f" Liczba szeregów: {ny}\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć: {n}\n")
         self.text_box.insert(tk.END, f" Kierunek lotu: {orientation}\n")
+        self.text_box.insert(tk.END, f" Współczynnik k: {k:.2f}\n")
         self.text_box.insert(tk.END, f"-----------------------------------\n")
         for comm in comms:
             messagebox.showinfo("Uwaga!", comm)
