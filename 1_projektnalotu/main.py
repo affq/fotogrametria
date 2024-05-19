@@ -134,8 +134,6 @@ class Window:
 
     def draw(self, event):
         try:
-            dx = float(self.bottom_right_x_entry.get()) - float(self.top_left_x_entry.get())
-            dy = float(self.bottom_right_y_entry.get()) - float(self.top_left_y_entry.get())
             gsd = .01*self.gsd_scale.get()
             camera = Camera(self.camera_combobox.get())
             p = float(self.p_scale.get())
@@ -150,22 +148,46 @@ class Window:
             messagebox.showerror("Błąd", "Wprowadź poprawne wartości.")
             return
 
-        velocity, _, gsd, Lx, Ly, bx, by, nx, ny, n, _, _, _, _, _, orientation = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
 
         fig, ax = plt.subplots()
-
         if orientation == 'v':
             for szereg in range(ny):
                 for zdjecie in range(nx-4):
-                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) - (zdjecie+1) * bx), by, bx, linewidth=1, edgecolor='r', facecolor='none'))
+                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) - (zdjecie+1) * bx), by, bx, linewidth=1, edgecolor='b', facecolor='none'))
 
-            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dy, dx, linewidth=3, edgecolor='g', facecolor='none')
+            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dy, -Dx, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
 
-        else:
-            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), dx, dy, linewidth=3, edgecolor='g', facecolor='none')
-        # ax.add_patch(rect)
+            for x in range(int(self.top_left_y_entry.get()) + int(0.5 * by), int(self.bottom_right_y_entry.get()) - int(0.5 * by), int(by)):
+                for y in range(int(self.bottom_right_x_entry.get()) - int (1.5 * bx), int(self.top_left_x_entry.get()) + int(1.5 * bx), int(bx)):
+                    ax.plot(x, y, 'ro')
+            
+            for x in range(int(self.top_left_y_entry.get()) + int(0.5*by), int(self.bottom_right_y_entry.get()) - int(0.5*by), int(by)):
+                ax.plot([x, x], [int(self.top_left_x_entry.get()) + int(1.5*bx), int(self.bottom_right_x_entry.get())- int(1.5*bx)], 'r-')
+            
+            for szereg in range(ny):
+                ax.text(float(self.top_left_y_entry.get()) + szereg*by + 0.5*by, float(self.top_left_x_entry.get()) + 2.5*bx, f"{szereg+1}", fontsize=12, color='r', ha='center')
+            
+            for szereg in range(1, ny, 2):
+                arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.bottom_right_x_entry.get()) - 1.5*bx), by, 2*bx, angle=0, theta1=-180, theta2=0, color='r')
+                ax.add_patch(arc)
+            
+            for szereg in range(2, ny, 2):
+                arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) + 1.5*bx), by, 2*bx, angle=0, theta1=0, theta2=180, color='r')
+                ax.add_patch(arc)
 
+            #Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
+            # (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
+            # cach linii, dł. 1 cm w kierunku lotu)
+            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get())], 'r>')
+
+
+        else:
+            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dx, Dy, linewidth=3, edgecolor='g', facecolor='none')
+            ax.add_patch(rect)
+        
+        ax.axis('equal')
         ax.autoscale()
         plt.show()
 
@@ -199,7 +221,7 @@ class Window:
             return
 
         self.text_box.config(state=tk.NORMAL)
-        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")

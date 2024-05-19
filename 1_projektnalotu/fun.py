@@ -112,7 +112,7 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
         height = calculate_max_height(plane, hmin, hmax)
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
      
-    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation
+    return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy
 
 def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
     limit = 1.05
