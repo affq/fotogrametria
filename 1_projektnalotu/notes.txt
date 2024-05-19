@@ -1,6 +1,0 @@
-czas potrzebny na przelot na podstawie prędkości lotu
-
-x y wprowadzane w geodezyjnym układzie współrzędnych
-my stosujemy układ matematyczny wiec zamieniamy współrzędne
-
-zautomatyzuj rangowanie prędkości

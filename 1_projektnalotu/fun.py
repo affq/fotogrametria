@@ -111,10 +111,8 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
     return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy
 
-def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
-    limit = 1.05
-    min_interval = limit * bx / plane.get_velocity_max()
-    n = nx * ny
-    time = (n - 1) * min_interval + 140 * (ny - 1)
+def calculate_time(n, ny, bx, velocity) -> float:
+    arc_time = 140*(ny-1)
+    time = (n * bx) / velocity + arc_time
     return time
 

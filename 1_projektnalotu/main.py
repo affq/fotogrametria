@@ -24,7 +24,7 @@ class Window:
         self.top_left_x.pack(side=tk.LEFT, pady=10)
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_x_entry.insert(0, "17219")
+        self.top_left_x_entry.insert(0, "20000")
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
@@ -43,7 +43,7 @@ class Window:
         self.bottom_right_y = ttk.Label(self.bottom_right_frame, text="Y:")
         self.bottom_right_y.pack(side=tk.LEFT, pady=10)
         self.bottom_right_y_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_y_entry.insert(0, "19090")
+        self.bottom_right_y_entry.insert(0, "20000")
         self.bottom_right_y_entry.pack(side=tk.LEFT, padx=10)
 
         self.heights_frame = tk.LabelFrame(self.options_frame, text="Wysokości terenu")
@@ -159,32 +159,32 @@ class Window:
             rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dy, -Dx, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
 
-            #działa dla nieparzystej liczby szeregów
-            for x in range(int(self.top_left_y_entry.get()) + int(0.5 * by), int(self.bottom_right_y_entry.get()) - int(0.5 * by), int(by)):
-                for y in range(int(self.bottom_right_x_entry.get()) - int (1.5 * bx), int(self.top_left_x_entry.get()) + int(1.5 * bx), int(bx)):
-                    ax.plot(x, y, 'ro')
-            
-            for x in range(int(self.top_left_y_entry.get()) + int(0.5*by), int(self.bottom_right_y_entry.get()) - int(0.5*by), int(by)):
-                ax.plot([x, x], [int(self.top_left_x_entry.get()) + int(1.5*bx), int(self.bottom_right_x_entry.get())- int(1.5*bx)], 'r-')
-            
             for szereg in range(ny):
                 ax.text(float(self.top_left_y_entry.get()) + szereg*by + 0.5*by, float(self.top_left_x_entry.get()) + 2.5*bx, f"{szereg+1}", fontsize=12, color='r', ha='center')
+
+            for x in range(int(self.top_left_y_entry.get()) + int(0.5 * by), int(self.bottom_right_y_entry.get()), int(by)):
+                for y in range(int(self.bottom_right_x_entry.get()) - int(1.5 * bx), int(self.top_left_x_entry.get()) + int(1.5 * bx), int(bx)):
+                    ax.plot(x, y, 'ro')
+            
+            for x in range(int(self.top_left_y_entry.get()) + int(0.5*by), int(self.bottom_right_y_entry.get()) - int(0.5*by) + 1, int(by)):
+                ax.plot([x, x], [int(self.top_left_x_entry.get()) + int(1.5*bx), int(self.bottom_right_x_entry.get()) - int(1.5*bx)], 'r-')
             
             for szereg in range(1, ny, 2):
                 arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.bottom_right_x_entry.get()) - 1.5*bx), by, 2*bx, angle=0, theta1=-180, theta2=0, color='r')
                 ax.add_patch(arc)
             
             for szereg in range(2, ny, 2):
+                if szereg == ny - 1:
+                    continue
                 arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) + 1.5*bx), by, 2*bx, angle=0, theta1=0, theta2=180, color='r')
                 ax.add_patch(arc)
 
-            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get())+ 1.5*bx, float(self.top_left_x_entry.get())+ 1.5*bx], 'b-')
-            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get())+ 1.4*bx, float(self.top_left_x_entry.get())+ 1.4*bx], 'bv')
-
-            ax.plot([float(self.bottom_right_y_entry.get()), float(self.bottom_right_y_entry.get()) - by], [float(self.bottom_right_x_entry.get())- 1.5*bx, float(self.bottom_right_x_entry.get())- 1.5*bx], 'b-')
-            ax.plot([float(self.bottom_right_y_entry.get()), float(self.bottom_right_y_entry.get()) - by], [float(self.bottom_right_x_entry.get())- 1.6*bx, float(self.bottom_right_x_entry.get())- 1.6*bx], 'bv')
+            ax.plot([float(self.top_left_y_entry.get()) + 0.5*by], [float(self.top_left_x_entry.get())+ 1.4*bx], 'bv', markersize=10)
+            if ny % 2 == 1:
+                ax.plot([float(self.bottom_right_y_entry.get())-0.5*by], [float(self.bottom_right_x_entry.get())- 1.5*bx], 'bv', markersize=10)
+            else: 
+                ax.plot([float(self.bottom_right_y_entry.get())-0.5*by], [float(self.top_left_x_entry.get()) + 1.5*bx], 'b^', markersize=10)
             
-            #kierunek północy
             ax.plot([float(self.bottom_right_y_entry.get())+ 2*by, float(self.bottom_right_y_entry.get())+2*by], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - 1.5*bx], 'g-')
             ax.plot([float(self.bottom_right_y_entry.get())+ 2*by], [float(self.top_left_x_entry.get())], 'g^')
             ax.text(float(self.bottom_right_y_entry.get())+ 2*by, float(self.top_left_x_entry.get()) - 2.5*bx, "N", fontsize=12, color='g', ha='center')
@@ -196,11 +196,11 @@ class Window:
                 for zdjecie in range(nx-4):
                     ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + zdjecie*bx, float(self.top_left_x_entry.get()) - (szereg+1) * by), bx, by, linewidth=1, edgecolor='b', facecolor='none'))
 
-            for x in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by), int(by)):
-                for y in range(int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx), int(bx)):
+            for x in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by) + 1, int(by)):
+                for y in range(int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx) + 1, int(bx)):
                     ax.plot(y, x, 'ro')
 
-            for y in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by), int(by)):
+            for y in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get())+1 - int(0.5*by), int(by)):
                 ax.plot([int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx)], [y, y], 'r-')
 
             for szereg in range(ny):
@@ -214,17 +214,16 @@ class Window:
                 arc = patches.Arc((float(self.bottom_right_y_entry.get()) + 1.5*bx, float(self.top_left_x_entry.get()) - szereg*by), 2*bx, by, angle=0, theta1=-90, theta2=90, color='r')
                 ax.add_patch(arc)
 
-            ax.plot([float(self.top_left_y_entry.get()) - 1.5*bx, float(self.top_left_y_entry.get()) - 1.5*bx], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - by], 'b-')
-            ax.plot([float(self.top_left_y_entry.get()) - 1.4*bx, float(self.top_left_y_entry.get()) - 1.4*bx], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - by], 'b>')
+            ax.plot([float(self.top_left_y_entry.get()) - 1.5 * bx], [float(self.top_left_x_entry.get())- 0.5 * by], 'b>', markersize=10)
 
-            ax.plot([float(self.bottom_right_y_entry.get()) + 1.5*bx, float(self.bottom_right_y_entry.get()) + 1.5*bx], [float(self.bottom_right_x_entry.get()), float(self.bottom_right_x_entry.get()) + by], 'b-')
-            ax.plot([float(self.bottom_right_y_entry.get()) + 1.58*bx, float(self.bottom_right_y_entry.get()) + 1.58*bx], [float(self.bottom_right_x_entry.get()), float(self.bottom_right_x_entry.get()) + by], 'b>')
+            if ny % 2 == 1:
+                ax.plot([float(self.bottom_right_y_entry.get()) + 1.58*bx], [float(self.bottom_right_x_entry.get()) + 0.5 * by], 'b>', markersize=10)
+            else:
+                ax.plot([float(self.top_left_y_entry.get()) - 1.5*bx], [float(self.bottom_right_x_entry.get()) + 0.5*by], 'b<', markersize=10)
 
-            #kierunek północy
             ax.plot([float(self.bottom_right_y_entry.get())+3*bx, float(self.bottom_right_y_entry.get())+3*bx], [float(self.top_left_x_entry.get()) - 2*by, float(self.top_left_x_entry.get())- by], 'g-')
             ax.plot([float(self.bottom_right_y_entry.get())+3*bx], [float(self.top_left_x_entry.get()) - by], 'g^')
             ax.text(float(self.bottom_right_y_entry.get()) + 3*bx, float(self.top_left_x_entry.get()) - 2.3*by, "N", fontsize=12, color='g', ha='center')
-
 
         ax.axis('equal')
         ax.autoscale()
@@ -261,7 +260,6 @@ class Window:
 
         self.text_box.config(state=tk.NORMAL)
         velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
-        print(orientation)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")
@@ -281,8 +279,8 @@ class Window:
         self.text_box.insert(tk.END, f"-----------------------------------\n")
         for comm in comms:
             messagebox.showinfo("Uwaga!", comm)
-        self.flight_time = calculate_time(nx, ny, bx, Plane(self.plane_combobox.get()))
-        self.text_box.insert(tk.END, f" Minimalny czas nalotu: {math.ceil(self.flight_time / 60)} min + droga z oraz do lotniska\n")
+        self.flight_time = calculate_time(n, ny, bx, velocity)
+        self.text_box.insert(tk.END, f" Czas wykonania nalotu: {math.ceil(self.flight_time / 60)} min\n")
         self.text_box.config(state=tk.DISABLED)
 
 if __name__ == "__main__":
