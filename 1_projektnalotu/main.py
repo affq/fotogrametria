@@ -24,7 +24,7 @@ class Window:
         self.top_left_x.pack(side=tk.LEFT, pady=10)
         self.top_left_x_entry = ttk.Entry(self.top_left_frame, width=10)
         self.top_left_x_entry.pack(side=tk.LEFT, padx=10)
-        self.top_left_x_entry.insert(0, "19090")
+        self.top_left_x_entry.insert(0, "17219")
 
         self.top_left_y = ttk.Label(self.top_left_frame, text="Y:")
         self.top_left_y.pack(side=tk.LEFT, pady=10)
@@ -43,7 +43,7 @@ class Window:
         self.bottom_right_y = ttk.Label(self.bottom_right_frame, text="Y:")
         self.bottom_right_y.pack(side=tk.LEFT, pady=10)
         self.bottom_right_y_entry = ttk.Entry(self.bottom_right_frame, width=10)
-        self.bottom_right_y_entry.insert(0, "17219")
+        self.bottom_right_y_entry.insert(0, "19090")
         self.bottom_right_y_entry.pack(side=tk.LEFT, padx=10)
 
         self.heights_frame = tk.LabelFrame(self.options_frame, text="Wysokości terenu")
@@ -159,6 +159,7 @@ class Window:
             rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dy, -Dx, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
 
+            #działa dla nieparzystej liczby szeregów
             for x in range(int(self.top_left_y_entry.get()) + int(0.5 * by), int(self.bottom_right_y_entry.get()) - int(0.5 * by), int(by)):
                 for y in range(int(self.bottom_right_x_entry.get()) - int (1.5 * bx), int(self.top_left_x_entry.get()) + int(1.5 * bx), int(bx)):
                     ax.plot(x, y, 'ro')
@@ -189,9 +190,42 @@ class Window:
             ax.text(float(self.bottom_right_y_entry.get())+ 2*by, float(self.top_left_x_entry.get()) - 2.5*bx, "N", fontsize=12, color='g', ha='center')
 
         else:
-            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dx, Dy, linewidth=3, edgecolor='g', facecolor='none')
+            rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dx, -Dy, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
-        
+            for szereg in range(ny):
+                for zdjecie in range(nx-4):
+                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + zdjecie*bx, float(self.top_left_x_entry.get()) - (szereg+1) * by), bx, by, linewidth=1, edgecolor='b', facecolor='none'))
+
+            for x in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by), int(by)):
+                for y in range(int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx), int(bx)):
+                    ax.plot(y, x, 'ro')
+
+            for y in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by), int(by)):
+                ax.plot([int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx)], [y, y], 'r-')
+
+            for szereg in range(ny):
+                ax.text(float(self.top_left_y_entry.get()) - 2.5*bx, float(self.top_left_x_entry.get()) - szereg*by - 0.5*by, f"{szereg+1}", fontsize=12, color='r', ha='center')
+
+            for szereg in range(2, ny, 2):
+                arc = patches.Arc((float(self.top_left_y_entry.get()) - 1.5*bx, float(self.top_left_x_entry.get()) - szereg*by), 2*bx, by, angle=0, theta1=90, theta2=270, color='r')
+                ax.add_patch(arc)
+            
+            for szereg in range(1, ny, 2):
+                arc = patches.Arc((float(self.bottom_right_y_entry.get()) + 1.5*bx, float(self.top_left_x_entry.get()) - szereg*by), 2*bx, by, angle=0, theta1=-90, theta2=90, color='r')
+                ax.add_patch(arc)
+
+            ax.plot([float(self.top_left_y_entry.get()) - 1.5*bx, float(self.top_left_y_entry.get()) - 1.5*bx], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - by], 'b-')
+            ax.plot([float(self.top_left_y_entry.get()) - 1.4*bx, float(self.top_left_y_entry.get()) - 1.4*bx], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - by], 'b>')
+
+            ax.plot([float(self.bottom_right_y_entry.get()) + 1.5*bx, float(self.bottom_right_y_entry.get()) + 1.5*bx], [float(self.bottom_right_x_entry.get()), float(self.bottom_right_x_entry.get()) + by], 'b-')
+            ax.plot([float(self.bottom_right_y_entry.get()) + 1.58*bx, float(self.bottom_right_y_entry.get()) + 1.58*bx], [float(self.bottom_right_x_entry.get()), float(self.bottom_right_x_entry.get()) + by], 'b>')
+
+            #kierunek północy
+            ax.plot([float(self.bottom_right_y_entry.get())+3*bx, float(self.bottom_right_y_entry.get())+3*bx], [float(self.top_left_x_entry.get()) - 2*by, float(self.top_left_x_entry.get())- by], 'g-')
+            ax.plot([float(self.bottom_right_y_entry.get())+3*bx], [float(self.top_left_x_entry.get()) - by], 'g^')
+            ax.text(float(self.bottom_right_y_entry.get()) + 3*bx, float(self.top_left_x_entry.get()) - 2.3*by, "N", fontsize=12, color='g', ha='center')
+
+
         ax.axis('equal')
         ax.autoscale()
         plt.show()

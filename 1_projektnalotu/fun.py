@@ -88,7 +88,6 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     height = calculate_height(gsd, camera)
     bool_height = check_height(height, hmin, hmax, plane)
     Dx, Dy, orientation = calculate_Dx_Dy(point_1, point_2)
-    print(f"orientation w def calculate: {orientation}")
     Lx, Ly = calculate_range(gsd, camera)
     bx0, by0 = calculate_base(Lx, Ly, p, q)
     nx, ny = calculate_amount_of_series(bx0, by0, Dx, Dy)
