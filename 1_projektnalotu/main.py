@@ -177,11 +177,16 @@ class Window:
                 arc = patches.Arc((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) + 1.5*bx), by, 2*bx, angle=0, theta1=0, theta2=180, color='r')
                 ax.add_patch(arc)
 
-            #Miejsce  włączenia  i  wyłączenia  kamery  –  pierwsze  i  ostatnie  zdjęcie   
-            # (niebieski, ciągły, gr. 1 mm, prostopadle do linii nalotu, strzałki na krań-
-            # cach linii, dł. 1 cm w kierunku lotu)
-            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get())], 'r>')
+            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get())+ 1.5*bx, float(self.top_left_x_entry.get())+ 1.5*bx], 'b-')
+            ax.plot([float(self.top_left_y_entry.get()), float(self.top_left_y_entry.get()) + by], [float(self.top_left_x_entry.get())+ 1.4*bx, float(self.top_left_x_entry.get())+ 1.4*bx], 'bv')
 
+            ax.plot([float(self.bottom_right_y_entry.get()), float(self.bottom_right_y_entry.get()) - by], [float(self.bottom_right_x_entry.get())- 1.5*bx, float(self.bottom_right_x_entry.get())- 1.5*bx], 'b-')
+            ax.plot([float(self.bottom_right_y_entry.get()), float(self.bottom_right_y_entry.get()) - by], [float(self.bottom_right_x_entry.get())- 1.6*bx, float(self.bottom_right_x_entry.get())- 1.6*bx], 'bv')
+            
+            #kierunek północy
+            ax.plot([float(self.bottom_right_y_entry.get())+ 2*by, float(self.bottom_right_y_entry.get())+2*by], [float(self.top_left_x_entry.get()), float(self.top_left_x_entry.get()) - 1.5*bx], 'g-')
+            ax.plot([float(self.bottom_right_y_entry.get())+ 2*by], [float(self.top_left_x_entry.get())], 'g^')
+            ax.text(float(self.bottom_right_y_entry.get())+ 2*by, float(self.top_left_x_entry.get()) - 2.5*bx, "N", fontsize=12, color='g', ha='center')
 
         else:
             rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dx, Dy, linewidth=3, edgecolor='g', facecolor='none')
@@ -212,8 +217,8 @@ class Window:
             p = float(self.p_scale.get())
             q = float(self.q_scale.get())
             plane = Plane(self.plane_combobox.get())
-            point_1 = (float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get()))
-            point_2 = (float(self.bottom_right_y_entry.get()), float(self.bottom_right_x_entry.get()))
+            point_1 = (float(self.top_left_x_entry.get()), float(self.top_left_y_entry.get()))
+            point_2 = (float(self.bottom_right_x_entry.get()), float(self.bottom_right_y_entry.get()))
             hmin = float(self.min_height_entry.get())
             hmax = float(self.max_height_entry.get())
         except Exception as e:
@@ -222,6 +227,7 @@ class Window:
 
         self.text_box.config(state=tk.NORMAL)
         velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy = calculate(gsd, camera, velocity, p, q, plane, point_1, point_2, hmin, hmax)
+        print(orientation)
         self.velocity_entry.set(int(mstokmh(velocity)))
         self.text_box.insert(tk.END, f"Obliczone parametry: \n")
         self.text_box.insert(tk.END, f" Prędkość: {int(mstokmh(velocity))} km/h\n")

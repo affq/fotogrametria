@@ -37,10 +37,13 @@ def check_interval(dtx: float, cam: Camera):
 def calculate_Dx_Dy(point_1: tuple, point_2: tuple):
     length_1 = abs(point_1[0] - point_2[0])
     length_2 = abs(point_1[1] - point_2[1])
+    orientation = 0
     if length_1 >= length_2:
-         return length_1, length_2
+         orientation = 'v'
+         return length_1, length_2, orientation
     else:
-        return length_2, length_1
+        orientation = 'h'
+        return length_2, length_1, orientation
 
 def calculate_max_velocity(camera: Camera, bx: float):
     max_freq = camera.get_cycle()
@@ -66,7 +69,7 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
         gsd = camera.get_pixel_size() * height / camera.get_focal_length()
         Lx, Ly = calculate_range(gsd, camera)
         bx, by = calculate_base(Lx, Ly, p, q)
-        Dx, Dy = calculate_Dx_Dy(point_1, point_2)
+        Dx, Dy, _ = calculate_Dx_Dy(point_1, point_2)
         nx, ny = calculate_amount_of_series(bx, by, Dx, Dy)
         bx, by, p, q = recalc_after_ceil(nx, ny, bx, by, Dx, Dy, Lx, Ly)
         n = nx * ny
@@ -84,18 +87,14 @@ def recalc_after_height_change(camera: Camera, velocity: float, p: float, q: flo
 def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, plane: Plane, point_1: tuple, point_2: tuple, hmin: float, hmax: float):
     height = calculate_height(gsd, camera)
     bool_height = check_height(height, hmin, hmax, plane)
-    Dx, Dy = calculate_Dx_Dy(point_1, point_2)
+    Dx, Dy, orientation = calculate_Dx_Dy(point_1, point_2)
+    print(f"orientation w def calculate: {orientation}")
     Lx, Ly = calculate_range(gsd, camera)
     bx0, by0 = calculate_base(Lx, Ly, p, q)
     nx, ny = calculate_amount_of_series(bx0, by0, Dx, Dy)
     bx, by, p, q = recalc_after_ceil(nx, ny, bx0, by0, Dx, Dy, Lx, Ly)
     n = nx * ny
     comms = []
-    if Dx >= Dy:
-         global orientation
-         orientation = "v"
-    else:
-        orientation = "h"
 
     if velocity > plane.get_velocity_max():
         velocity = .95* plane.get_velocity_max()
@@ -111,7 +110,6 @@ def calculate(gsd: float, camera: Camera, velocity: float, p: float, q: float, p
     if bool_height == False:
         height = calculate_max_height(plane, hmin, hmax)
         gsd, Lx, Ly, bx, by, nx, ny, n = recalc_after_height_change(camera, velocity, p, q, plane, point_1, point_2, hmin, hmax, height)
-     
     return velocity, height, gsd, Lx, Ly, bx, by, nx, ny, n, p, q, bx0, by0, comms, orientation, Dx, Dy
 
 def calculate_time(nx: int, ny: int, bx: float, plane: Plane) -> float:
