@@ -95,7 +95,7 @@ class Window:
 
         self.p_frame = tk.Frame(self.options_frame)
         self.p_frame.pack(side=tk.TOP, padx=10, anchor=tk.NW)
-        self.p_label = ttk.Label(self.p_frame, text="Pokrycie poprzeczne:")
+        self.p_label = ttk.Label(self.p_frame, text="Pokrycie podłużne:")
         self.p_label.pack(side=tk.LEFT, pady=10)
         self.p_scale = tk.Scale(self.p_frame, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL)
         self.p_scale.set(60)
@@ -103,7 +103,7 @@ class Window:
 
         self.q_frame = tk.Frame(self.options_frame)
         self.q_frame.pack(side=tk.TOP, padx=10, anchor=tk.NW)
-        self.q_label = ttk.Label(self.q_frame, text="Pokrycie podłużne:")
+        self.q_label = ttk.Label(self.q_frame, text="Pokrycie poprzeczne:")
         self.q_label.pack(side=tk.LEFT, pady=10)
         self.q_scale = tk.Scale(self.q_frame, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL)
         self.q_scale.set(30)
@@ -266,8 +266,8 @@ class Window:
         # self.text_box.insert(tk.END, f" Terenowy zasięg zdjęcia wpoprzek kierunku lotu: {int(Ly)} m\n")
         # self.text_box.insert(tk.END, f" Baza podłużna: {round(bx0)} m\n")
         # self.text_box.insert(tk.END, f" Baza poprzeczna: {round(by0)} m\n")
-        self.text_box.insert(tk.END, f" Nowe pokrycie poprzeczne (p): {round(p,1)} %\n")
-        self.text_box.insert(tk.END, f" Nowe pokrycie podłużne (q): {round(q,1)} %\n")
+        self.text_box.insert(tk.END, f" Nowe pokrycie podłużne (p): {round(p,1)} %\n")
+        self.text_box.insert(tk.END, f" Nowe pokrycie poprzeczne (q): {round(q,1)} %\n")
         self.text_box.insert(tk.END, f" Nowa baza podłużna: {int(bx)} m\n")
         self.text_box.insert(tk.END, f" Nowa baza poprzeczna: {int(by)} m\n")
         self.text_box.insert(tk.END, f" Liczba zdjęć w szeregu: {nx}\n")
