@@ -152,9 +152,9 @@ class Window:
 
         fig, ax = plt.subplots()
         if orientation == 'v':
-            for szereg in range(ny):
-                for zdjecie in range(nx-4):
-                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) - (zdjecie+1) * bx), by, bx, linewidth=1, edgecolor='b', facecolor='none'))
+            # for szereg in range(ny):
+            #     for zdjecie in range(nx-4):
+            #         ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + szereg*by, float(self.top_left_x_entry.get()) - (zdjecie+1) * bx), by, bx, linewidth=1, edgecolor='b', facecolor='none'))
 
             rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dy, -Dx, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
@@ -190,9 +190,9 @@ class Window:
         else:
             rect = patches.Rectangle((float(self.top_left_y_entry.get()), float(self.top_left_x_entry.get())), Dx, -Dy, linewidth=3, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
-            for szereg in range(ny):
-                for zdjecie in range(nx-4):
-                    ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + zdjecie*bx, float(self.top_left_x_entry.get()) - (szereg+1) * by), bx, by, linewidth=1, edgecolor='b', facecolor='none'))
+            # for szereg in range(ny):
+            #     for zdjecie in range(nx-4):
+            #         ax.add_patch(patches.Rectangle((float(self.top_left_y_entry.get()) + zdjecie*bx, float(self.top_left_x_entry.get()) - (szereg+1) * by), bx, by, linewidth=1, edgecolor='b', facecolor='none'))
 
             for x in range(int(self.bottom_right_x_entry.get()) + int(0.5*by), int(self.top_left_x_entry.get()) - int(0.5*by) + 1, int(by)):
                 for y in range(int(self.top_left_y_entry.get()) - int(1.5*bx), int(self.bottom_right_y_entry.get()) + int(1.5*bx) + 1, int(bx)):
@@ -279,7 +279,7 @@ class Window:
         for comm in comms:
             messagebox.showinfo("Uwaga!", comm)
         self.flight_time = calculate_time(n, ny, bx, velocity)
-        self.text_box.insert(tk.END, f" Czas wykonania nalotu: {math.ceil(self.flight_time / 60)} min\n")
+        self.text_box.insert(tk.END, f" Czas wykonania nalotu: około {math.ceil(self.flight_time / 60)} min\n")
         self.text_box.config(state=tk.DISABLED)
 
 if __name__ == "__main__":
