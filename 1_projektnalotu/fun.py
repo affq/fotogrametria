@@ -58,7 +58,6 @@ def calculate_max_height(plane: Plane, hmin: float, hmax: float):
     return limit * height
 
 def recalc_after_ceil(nx: int, ny: int, bx: float, by: float, Dx: float, Dy: float, Lx: float, Ly: float):
-    # tu też xd
     by = Dy/ny
     bx = Dx/(nx - 4)
     p = 100 - 100*bx/Lx
