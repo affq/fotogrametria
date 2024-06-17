@@ -5,8 +5,6 @@ img = cv2.imread(r'mario.png')
 imgG = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #cx, cy - połowa szerokości i wysokości obrazu; punkt centralny obrazu
-
-
 #fx, fy - ogniskowa obrazu
 fx = fy = 4680
 

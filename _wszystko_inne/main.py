@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-tiff = cv2.imread('4_transformacja/724.tif')
+tiff = cv2.imread('724.tif')
 gtiff = cv2.cvtColor(tiff, cv2.COLOR_BGR2GRAY)
 w, h = tiff.shape[:2]
 
