@@ -8,7 +8,7 @@ img = cv2.imread('724.tif')
 img = cv2.rotate(img, cv2.ROTATE_180)
 gImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-krzyz_1 = cv2.imread('krzyz.tif',0)
+krzyz_1 = cv2.imread('krzyz_1.tif',0)
 krzyz_2 = cv2.imread('krzyz_2.tif',0)
 templates = [krzyz_1, krzyz_2]
 
@@ -50,11 +50,11 @@ def zoom(event, x, y, flags, params):
         topleft_x = x
         topleft_y = y
 
-        start_x = max(x - zoom_level, 0)
-        end_x = min(x + zoom_level, img.shape[1])
-        start_y = max(y - zoom_level, 0)
-        end_y = min(y + zoom_level, img.shape[0])
-        cropped_img = img[start_y:end_y, start_x:end_x]
+        min_x = max(x - zoom_level, 0)
+        max_x = min(x + zoom_level, img.shape[1])
+        min_y = max(y - zoom_level, 0)
+        max_y = min(y + zoom_level, img.shape[0])
+        cropped_img = img[min_y:max_y, min_x:max_x]
 
         cv2.imshow('zoom', cropped_img)
         cv2.setMouseCallback('zoom', match)
@@ -71,13 +71,11 @@ if len(centers) == 8:
         for i,center in enumerate(centers):
             f.write(f'{i+1} {center[0]} {center[1]}\n')
 
-
 tlowe = []
 with open('tlowe.txt', 'r') as f:
     for line in f:
         _, x, y = map(float, line.split())
         tlowe.append((x, y))
-
 tlowe = np.array(tlowe)
 
 pikselowe = []
@@ -85,7 +83,34 @@ with open('pikselowe.txt', 'r') as f:
     for line in f:
         _, x, y = map(float, line.split())
         pikselowe.append((x, y))
-
 pikselowe = np.array(pikselowe)
 
-# Wykonanie transformacji afinicznej do zamiany współrzędnych pikselowych na układ tłowy
+A = []
+L = []
+for xi, yi, Xi, Yi in zip(pikselowe[:,0], pikselowe[:,1], tlowe[:,0], tlowe[:,1]):
+    L.append([Xi])
+    L.append([Yi])
+    A.append([1, xi, yi, 0, 0, 0])
+    A.append([0, 0, 0, 1, xi, yi])
+A = np.array(A)
+L = np.array(L)
+
+X = np.linalg.inv(A.T @ A) @ A.T @ L
+X = np.array(X).reshape(-1)
+print(f"Wyznaczone parametry:\n {X}\n")
+
+X0 = np.array([X[0], X[3]])
+A = np.array([[X[1], X[2]], [X[4], X[5]]])
+
+nowe = []
+for xi, yi in pikselowe:
+    x, y = X0 + A @ np.array([xi, yi])
+    nowe.append((x, y))
+nowe = np.array(nowe)
+print(f"Obliczone współrzędne:\n {nowe}\n")
+
+v = nowe - tlowe
+print(f"Wartości błędów na badanych punktach:\n {v}\n")
+
+m0 = np.sqrt(np.sum(v**2)/(len(v)-6))
+print(f"Wartość błędu wyrównania:\n {m0}\n")

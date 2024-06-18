@@ -4,8 +4,6 @@ import os
 
 os.chdir('2_transformacje/')
 
-threshold = 0.75
-
 img = cv2.imread('724.tif')
 gImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 w, h = gImg.shape[::-1]
